@@ -10,6 +10,6 @@ export const githubAuthenticated = ({ user, token }) => axios.create({
   auth: { username: user, password: token },
   headers: {
     Accept: "application/vnd.github.v3+json",
-    'Content-Length': '0'
+    // 'Content-Length': '0'
   }
 })

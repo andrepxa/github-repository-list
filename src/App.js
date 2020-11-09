@@ -1,15 +1,23 @@
 import { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import { Button, TextField } from '@material-ui/core'
+import { Button, TextField, Typography } from '@material-ui/core'
 
 import { github, githubAuthenticated } from './services/github'
 import RepositoryList from './components/RepositoryList'
 
 import './App.css'
 
+const useStyles = makeStyles((theme) => ({
+  text: {
+    width: '300px',
+    marginBottom: '10px'
+  }
+}))
+
 function App () {
+  const classes = useStyles()
   const [user, setUser] = useState('')
-  const [token, setToken] = useState('ad74eebd22d8304ca357344bdadb7cf273453d39')
+  const [token, setToken] = useState('')
   const [username, setUsername] = useState('')
   const [repositories, setRepositories] = useState([])
 
@@ -37,7 +45,7 @@ function App () {
     if (starred) {
       await githubAuthenticated({ user, token }).delete(`user/starred/${owner.login}/${name}`)
     } else {
-      await githubAuthenticated({ user, token }).post(`user/starred/${owner.login}/${name}`)
+      await githubAuthenticated({ user, token }).put(`user/starred/${owner.login}/${name}`)
     }
 
     const newRepositories = [...repositories]
@@ -47,17 +55,20 @@ function App () {
 
   return (
     <div className="App App-header">
+      <Typography>Authentication for starring repositories</Typography>
       <TextField
+        className={classes.text}
         value={user}
         onChange={e => setUser(e.target.value)}
         label="username"
         variant="outlined"
       />
       <TextField
+        className={classes.text}
         value={token}
         type="password"
         onChange={e => setToken(e.target.value)}
-        helperText="A personal access token is required to star a repo with 'public_repo' scope"
+        helperText="An username and personal access token with 'public_repo' scope are required to manage stars from repositories"
         label="token"
         variant="outlined"
       />
