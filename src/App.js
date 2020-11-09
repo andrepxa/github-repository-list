@@ -2,7 +2,12 @@ import { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { Button, TextField, Typography } from '@material-ui/core'
 
-import { github, githubAuthenticated } from './services/github'
+import {
+  github,
+  getRepositoryStar,
+  starRepository,
+  unstarRepository
+} from './services/github'
 import RepositoryList from './components/RepositoryList'
 
 import './App.css'
@@ -28,8 +33,12 @@ function App () {
 
       if (!!user && !!token) {
         repos = await Promise.all(repos.map(({ name, html_url, owner }) =>
-          githubAuthenticated({ user, token })
-            .get(`user/starred/${owner.login}/${name}`)
+          getRepositoryStar({
+            user,
+            token,
+            repoName: name,
+            repoUser: owner.login
+          })
             .then(_ => ({ name, html_url, owner, starred: true }))
             .catch(_ => ({ name, html_url, owner, starred: false }))
         ))
@@ -41,11 +50,16 @@ function App () {
 
   const onStarClick = async repositoryIndex => {
     const { starred, owner, name } = repositories[repositoryIndex]
+    const params = {
+      user, token,
+      repoName: name,
+      repoUser: owner.login
+    }
 
     if (starred) {
-      await githubAuthenticated({ user, token }).delete(`user/starred/${owner.login}/${name}`)
+      await unstarRepository(params)
     } else {
-      await githubAuthenticated({ user, token }).put(`user/starred/${owner.login}/${name}`)
+      await starRepository(params)
     }
 
     const newRepositories = [...repositories]
