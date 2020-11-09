@@ -6,6 +6,9 @@ import StarIcon from '@material-ui/icons/Star'
 import StarEmptyIcon from '@material-ui/icons/StarBorder'
 
 const useStyles = makeStyles((theme) => ({
+  link: {
+    cursor: 'pointer'
+  },
   star: {
     color: 'yellow',
     marginRight: 2,
@@ -13,24 +16,25 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const StarredIcon = ({ isStarred, onClick }) => {
-  const classes = useStyles()
+const StarredIcon = ({ isStarred, ...props }) => {
   const Star = isStarred ? StarIcon : StarEmptyIcon
-  return <Star className={classes.star} onClick={onClick} />
+  return <Star {...props} />
 }
 
 function RepositoryList ({
   repositories = [],
   onStarClick
 }) {
+  const classes = useStyles()
   return <List dense={true}>
-    {repositories.map(repo => {
-      return <ListItem key={repo.id}>
+    {repositories.map((repo, i) => {
+      return <ListItem key={`repo-${i}`}>
         <StarredIcon
           isStarred={repo.starred}
-          onClick={() => onStarClick(repo.name, repo.owner.login)}
+          className={classes.star}
+          onClick={() => onStarClick(i)}
         />
-        <Link target="_blank" rel="noopener" href={repo.html_url}>
+        <Link className={classes.link} target="_blank" rel="noopener" href={repo.html_url}>
           {repo.name}
         </Link>
       </ListItem>
